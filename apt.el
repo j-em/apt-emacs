@@ -1852,11 +1852,22 @@ The tokens that can be replaced are:
 		 url))))
   url)
 
+(defun apt-utils--get-timestamped-file ()
+  "Return the file attributes for the default file used to check the timestamp."
+  (-some->> apt-utils-timestamped-file
+	    file-attributes))
+
+(defun apt-utils--get-timestamp ()
+  "Return the latest time APT cache was updated."
+  (-if-let (file (apt-utils--get-timestamped-file))
+      (nth 5 file)
+    (error "Could not determine timestamp - Try running apt-get update ?")))
+
 (defun apt-utils-packages-needs-update ()
   "Return t if `apt-utils' package lists needs updating."
   (or (not apt-utils-package-list-built)
       (apt-utils-time-less-p apt-utils-package-list-built
-			     (nth 5 (file-attributes apt-utils-timestamped-file)))))
+			     (apt-utils--get-timestamp))))
 
 (defun apt-utils-update-mode-name ()
   "Update `mode-name' for all buffers in `apt-utils-mode'."
