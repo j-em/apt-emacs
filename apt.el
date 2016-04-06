@@ -675,8 +675,7 @@ Use PROMPT for `completing-read'."
 (defun apt-utils-toggle-package-info ()
   "Toggle between package and showpkg info for normal packages."
   (interactive)
-  (unless (equal major-mode 'apt-utils-mode)
-    (error "Not in APT utils buffer"))
+  (apt-utils--check-major-mode)
   (let ((package (caar apt-utils-package-history))
 	(type (cdar apt-utils-package-history))
 	posns)
@@ -737,9 +736,8 @@ See also `apt-utils-toggle-package-info'."
 (defun apt-utils-view-changelog ()
   "Find ChangeLog for the current package."
   (interactive)
+  (apt-utils--check-major-mode)
   (cond
-   ((not (equal major-mode 'apt-utils-mode))
-    (message "Not in APT utils buffer."))
    ((not (memq (cdar apt-utils-package-history) '(normal normal-showpkg)))
     (message "Not a normal package."))
    (t
@@ -764,9 +762,8 @@ See also `apt-utils-toggle-package-info'."
 (defun apt-utils-view-debian-changelog ()
   "Find Debian ChangeLog for the current package."
   (interactive)
+  (apt-utils--check-major-mode)
   (cond
-   ((not (equal major-mode 'apt-utils-mode))
-    (message "Not in APT utils buffer."))
    ((not (memq (cdar apt-utils-package-history) '(normal normal-showpkg)))
     (message "Not a normal package."))
    (t
@@ -791,9 +788,8 @@ See also `apt-utils-toggle-package-info'."
 (defun apt-utils-view-news ()
   "Find NEWS for the current package."
   (interactive)
+  (apt-utils--check-major-mode)
   (cond
-   ((not (equal major-mode 'apt-utils-mode))
-    (message "Not in APT utils buffer."))
    ((not (memq (cdar apt-utils-package-history) '(normal normal-showpkg)))
     (message "Not a normal package."))
    (t
@@ -818,9 +814,8 @@ See also `apt-utils-toggle-package-info'."
 (defun apt-utils-view-debian-news ()
   "Find Debian NEWS for the current package."
   (interactive)
+  (apt-utils--check-major-mode)
   (cond
-   ((not (equal major-mode 'apt-utils-mode))
-    (message "Not in APT utils buffer."))
    ((not (memq (cdar apt-utils-package-history) '(normal normal-showpkg)))
     (message "Not a normal package."))
    (t
@@ -845,9 +840,8 @@ See also `apt-utils-toggle-package-info'."
 (defun apt-utils-view-readme ()
   "Find README for the current package."
   (interactive)
+  (apt-utils--check-major-mode)
   (cond
-   ((not (equal major-mode 'apt-utils-mode))
-    (message "Not in APT utils buffer."))
    ((not (memq (cdar apt-utils-package-history) '(normal normal-showpkg)))
     (message "Not a normal package."))
    (t
@@ -872,9 +866,8 @@ See also `apt-utils-toggle-package-info'."
 (defun apt-utils-view-debian-readme ()
   "Find Debian README for the current package."
   (interactive)
+  (apt-utils--check-major-mode)
   (cond
-   ((not (equal major-mode 'apt-utils-mode))
-    (message "Not in APT utils buffer."))
    ((not (memq (cdar apt-utils-package-history) '(normal normal-showpkg)))
     (message "Not a normal package."))
    (t
@@ -899,9 +892,8 @@ See also `apt-utils-toggle-package-info'."
 (defun apt-utils-view-copyright ()
   "Find copyright file for the current package."
   (interactive)
+  (apt-utils--check-major-mode)
   (cond
-   ((not (equal major-mode 'apt-utils-mode))
-    (message "Not in APT utils buffer."))
    ((not (memq (cdar apt-utils-package-history) '(normal normal-showpkg)))
     (message "Not a normal package."))
    (t
@@ -921,14 +913,18 @@ See also `apt-utils-toggle-package-info'."
 	  '(""))))
     file))
 
+(defun apt-utils--check-major-mode (&optional reporter)
+  "Checking if we are in the package major mode and report with reporter if we are not."
+  (unless (equal major-mode 'apt-utils-mode)
+    (funcall (or reporter 'message) "Not in APT utils buffer")))
+
 (defun apt-utils-view-man-page ()
   "View man page for the current package.
 If there is more than one man page associated with the package,
 offer a choice."
   (interactive)
+  (apt-utils--check-major-mode)
   (cond
-   ((not (equal major-mode 'apt-utils-mode))
-    (message "Not in APT utils buffer."))
    ((not (memq (cdar apt-utils-package-history) '(normal normal-showpkg)))
     (message "Not a normal package."))
    (t
@@ -969,9 +965,8 @@ offer a choice."
 If there is more than one file associated with the package, offer
 a choice."
   (interactive)
+  (apt-utils--check-major-mode)
   (cond
-   ((not (equal major-mode 'apt-utils-mode))
-    (message "Not in APT utils buffer."))
    ((not (memq (cdar apt-utils-package-history) '(normal normal-showpkg)))
     (message "Not a normal package."))
    (t
@@ -1141,8 +1136,7 @@ With non-nil NEW-SESSION, follow link in a new buffer."
 (defun apt-utils-view-previous-package ()
   "Go back to previous package displayed."
   (interactive)
-  (unless (equal major-mode 'apt-utils-mode)
-    (error "Not in APT utils buffer"))
+  (apt-utils--check-major-mode 'error)
   (if (cdr apt-utils-package-history)
       (progn
 	(let ((posns (apt-utils-update-buffer-positions 'backward)))
@@ -1163,8 +1157,7 @@ See also `apt-utils-package-history'."
   "Move point to the ARG next package.
 ARG may be negative to move backward."
   (interactive "p")
-  (unless (equal major-mode 'apt-utils-mode)
-    (error "Not in APT utils buffer"))
+  (apt-utils--check-major-mode 'error)
   (cond
    ;; No links
    ((or (null apt-utils-current-links)
@@ -1229,9 +1222,8 @@ With non-nil NEW-SESSION, follow link in a new buffer."
 (defun apt-utils-choose-package-link-internal (new-session)
   "Choose a Debian package from a list of links.
 With non-nil NEW-SESSION, follow link in a new buffer."
+  (apt-utils--check-major-mode)
   (cond
-   ((not (equal major-mode 'apt-utils-mode))
-    (error "Not in APT utils buffer"))
    ((= (hash-table-count apt-utils-current-links) 0)
     (message "No package links."))
    (t
@@ -1606,8 +1598,7 @@ packages."
 With prefix argument KILL-BUFFER, kill the `apt-utils-mode'
 buffer."
   (interactive "P")
-  (unless (equal major-mode 'apt-utils-mode)
-    (error "Not in APT utils buffer"))
+  (apt-utils--check-major-mode)
   (let ((buffer (current-buffer)))
     (if (fboundp 'quit-window)
 	(quit-window)
@@ -1638,9 +1629,8 @@ there are no buffers left in `apt-utils-mode'."
 See `apt-utils-kill-buffer-confirmation-function' for
 customisation options."
   (interactive)
+  (apt-utils--check-major-mode)
   (cond
-   ((not (eq major-mode 'apt-utils-mode))
-    (error "Not in APT utils buffer"))
    ((not (cdr (window-list)))
     (message "No other windows to kill"))
    (t
@@ -1801,9 +1791,8 @@ TYPE can be forward, backward, or toggle."
   "Browse Debian-related URL.
 The URL can contain tokens that need formatting (see
 `apt-utils-web-format-url')."
+  (apt-utils--check-major-mode)
   (cond
-   ((not (equal major-mode 'apt-utils-mode))
-    (message "Not in APT utils buffer."))
    ((not (memq (cdar apt-utils-package-history) '(normal normal-showpkg)))
     (message "Not a normal package."))
    (t
