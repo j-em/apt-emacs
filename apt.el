@@ -1095,12 +1095,13 @@ SUFFIXES."
   "Follow hyperlink at point.
 With non-nil NEW-SESSION, follow link in a new buffer."
   (interactive "P")
-  (unless (equal major-mode 'apt-utils-mode)
-    (error "Not in APT utils buffer"))
-  (let ((package
-	 (cadr
-	  (member 'apt-package (text-properties-at (point))))))
-    (apt-utils-follow-link-internal package new-session)))
+  (if (equal major-mode 'apt-utils-mode)
+      (->> (point)
+	   text-properties-at
+	   (member 'apt-package)
+	   cadr
+	   (funcall (-rpartial 'apt-utils-follow-link-internal new-session)))
+    (error "Not in APT utils buffer")))
 
 (defun apt-utils-mouse-follow-link (event)
   "Follow hyperlink at mouse click.
